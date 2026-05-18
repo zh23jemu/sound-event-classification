@@ -23,6 +23,7 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+~$*.docx
 
 # 临时文件与运行缓存
 *.tmp
