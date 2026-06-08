@@ -1,30 +1,30 @@
-# ESC-50 CNN Baseline 结果摘要
+# ESC-50 Pretrained AST 结果摘要
 
 ## 整体结果
 
-- 训练轮数：20
+- 训练轮数：10
 - 验证样本数：400
-- 最佳验证 Accuracy：0.4125（第 19 轮）
-- 最佳轮验证 Loss：2.0202
-- 最后一轮训练 Accuracy：0.4688
-- 最后一轮验证 Accuracy：0.4075
-- 最后一轮验证 Loss：2.1383
+- 最佳验证 Accuracy：0.9300（第 4 轮）
+- 最佳轮验证 Loss：0.2205
+- 最后一轮训练 Accuracy：1.0000
+- 最后一轮验证 Accuracy：0.9225
+- 最后一轮验证 Loss：0.2589
 
 ## 类别级表现较好
 
-- class_13：Accuracy 1.0000，8/8
-- class_49：Accuracy 0.8750，7/8
-- class_42：Accuracy 0.8750，7/8
-- class_27：Accuracy 0.8750，7/8
-- class_17：Accuracy 0.8750，7/8
+- class_46：Accuracy 1.0000，8/8
+- class_44：Accuracy 1.0000，8/8
+- class_43：Accuracy 1.0000，8/8
+- class_42：Accuracy 1.0000，8/8
+- class_39：Accuracy 1.0000，8/8
 
 ## 类别级表现较弱
 
-- class_02：Accuracy 0.0000，0/8
-- class_06：Accuracy 0.0000，0/8
-- class_08：Accuracy 0.0000，0/8
-- class_14：Accuracy 0.0000，0/8
-- class_23：Accuracy 0.0000，0/8
+- class_40：Accuracy 0.5000，4/8
+- class_02：Accuracy 0.6250，5/8
+- class_33：Accuracy 0.7500，6/8
+- class_47：Accuracy 0.7500，6/8
+- class_03：Accuracy 0.8750，7/8
 
 ## 生成文件
 
