@@ -72,6 +72,7 @@
 - 已开始按照项目计划进入代码实现阶段，新增 ESC-50 baseline 的最小可运行工程骨架。
 - 已新增 `README.md`、`requirements.txt`、`configs/esc50_baseline.yaml`、`scripts/prepare_esc50.py`、`scripts/train.py`、`src/sound_event_classification/`、`slurm/train_esc50_baseline.sbatch` 和 `项目日志.md`。
 - 服务器端 ESC-50 baseline 已完成首次 20 epoch 训练，最佳验证 Accuracy 为 0.4125，最佳模型保存到 `outputs/esc50_baseline/best_model.pt`。
+- 已基于同步回本地的 `history.json` 和 `latest_val_metrics.json` 生成训练曲线、归一化混淆矩阵、类别级指标 CSV 和 Markdown 结果摘要。
 
 ## Recent Changes
 
@@ -98,10 +99,11 @@
 - 更新 `.gitignore`，忽略原始数据目录、大模型权重、checkpoint 和 Slurm 运行日志，但不整体忽略 `outputs/`，保留小型指标和图表用于报告分析。
 - 服务器首次运行 ESC-50 baseline 时，数据检查通过且任务成功切换到 `ISP` 分区，但训练在 `torchaudio.load()` 阶段触发 TorchCodec/FFmpeg 依赖问题；已改用 `scipy.io.wavfile` 读取 ESC-50 WAV，避开 TorchCodec。
 - 服务器重跑 ESC-50 baseline 成功完成：Slurm 作业 `34857536` 在 `ISP` 分区完成 20 epoch，最佳验证 Accuracy = 0.4125，说明当前数据读取、Log-Mel 特征、CNN 训练和 Slurm 提交流程均已跑通。
+- 新增 `scripts/analyze_esc50_results.py`，生成 `outputs/esc50_baseline/analysis/training_loss.png`、`training_accuracy.png`、`confusion_matrix_normalized.png`、`class_metrics.csv` 和 `summary.md`。
 
 ## Next TODO
 
-- 从服务器同步 `outputs/esc50_baseline/history.json`、`outputs/esc50_baseline/latest_val_metrics.json` 等小型结果文件，生成训练曲线、类别级指标和混淆矩阵。
+- 同步或保留 ESC-50 元数据 `meta/esc50.csv`，重新运行分析脚本以显示真实类别名称。
 - 在已跑通的 CNN baseline 基础上做改进比较，优先尝试 SpecAugment、mixup、随机裁剪等数据增强。
 - 接入预训练 AST/ViT，并比较 CNN baseline、增强 CNN、预训练 Transformer 微调之间的效果差异。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
@@ -119,7 +121,7 @@
 - 当前总篇幅约为 `文献综述.md` 4810 个中文字符、`项目计划.md` 2610 个中文字符，理论上接近但应能控制在 12 页内；实际页数仍需以 Word 渲染为准。
 - 当前 `.venv` 依赖尚未完整安装；本次执行 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 在 120 秒后超时，仍缺 `torch`、`pandas` 等依赖。
 - 本地 Windows 环境仍未完成完整依赖安装，真实训练目前以服务器 Slurm 环境为准。
-- ESC-50 baseline 已跑通，但当前仅有整体 Accuracy，需要补充类别级指标和错误分析，避免报告中只有单一数值。
+- ESC-50 baseline 已生成类别级指标和混淆矩阵，但本地缺少 ESC-50 元数据时类别名只能显示为编号；如报告需要可读类别名称，需要同步 `meta/esc50.csv` 或在服务器上运行分析脚本。
 
 ## Architecture Decisions
 

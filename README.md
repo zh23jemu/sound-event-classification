@@ -9,6 +9,7 @@
 | `configs/esc50_baseline.yaml` | ESC-50 baseline 默认配置 |
 | `scripts/prepare_esc50.py` | 检查 ESC-50 数据目录是否准备好 |
 | `scripts/train.py` | 训练和验证入口 |
+| `scripts/analyze_esc50_results.py` | 分析训练结果，生成曲线、混淆矩阵和类别级指标 |
 | `src/sound_event_classification/data.py` | ESC-50 数据读取与音频裁剪/填充 |
 | `src/sound_event_classification/features.py` | Log-Mel Spectrogram 特征提取 |
 | `src/sound_event_classification/models.py` | 当前轻量 CNN baseline，后续可接入 AST/ViT |
@@ -84,6 +85,22 @@ sbatch --partition=gpu slurm/train_esc50_baseline.sbatch
 - `best_model.pt`：验证 Accuracy 最好的模型权重。
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
+
+## 结果分析
+
+训练完成并同步 `history.json`、`latest_val_metrics.json` 后，可运行：
+
+```powershell
+.venv\Scripts\python.exe scripts\analyze_esc50_results.py
+```
+
+脚本默认生成到 `outputs/esc50_baseline/analysis`：
+
+- `training_loss.png`：训练/验证 Loss 曲线。
+- `training_accuracy.png`：训练/验证 Accuracy 曲线。
+- `confusion_matrix_normalized.png`：归一化混淆矩阵。
+- `class_metrics.csv`：每个类别的样本数、正确数和类别准确率。
+- `summary.md`：适合写入报告的结果摘要。
 
 ## 常见问题
 
