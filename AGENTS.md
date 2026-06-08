@@ -74,6 +74,7 @@
 - 服务器端 ESC-50 baseline 已完成首次 20 epoch 训练，最佳验证 Accuracy 为 0.4125，最佳模型保存到 `outputs/esc50_baseline/best_model.pt`。
 - 已基于同步回本地的 `history.json` 和 `latest_val_metrics.json` 生成训练曲线、归一化混淆矩阵、类别级指标 CSV 和 Markdown 结果摘要。
 - 已新增 CNN + SpecAugment 对比实验入口，配置为 `configs/esc50_cnn_specaugment.yaml`，默认输出到 `outputs/esc50_cnn_specaugment`。
+- 服务器端 CNN + SpecAugment 已完成训练，最佳验证 Accuracy 为 0.4200，相比 CNN baseline 的 0.4125 提升 +0.0075；已生成 `outputs/esc50_comparison` 对比摘要。
 
 ## Recent Changes
 
@@ -102,11 +103,12 @@
 - 服务器重跑 ESC-50 baseline 成功完成：Slurm 作业 `34857536` 在 `ISP` 分区完成 20 epoch，最佳验证 Accuracy = 0.4125，说明当前数据读取、Log-Mel 特征、CNN 训练和 Slurm 提交流程均已跑通。
 - 新增 `scripts/analyze_esc50_results.py`，生成 `outputs/esc50_baseline/analysis/training_loss.png`、`training_accuracy.png`、`confusion_matrix_normalized.png`、`class_metrics.csv` 和 `summary.md`。
 - 新增 `SpecAugment` 训练增强模块，并更新 `scripts/train.py` 支持训练阶段增强、验证阶段关闭；更新 Slurm 脚本支持 `CONFIG` 环境变量切换配置。
+- 新增 `scripts/compare_esc50_experiments.py`，并生成 CNN baseline 与 CNN + SpecAugment 的对比表；SpecAugment 最佳验证 Accuracy = 0.4200，baseline = 0.4125。
 
 ## Next TODO
 
 - 同步或保留 ESC-50 元数据 `meta/esc50.csv`，重新运行分析脚本以显示真实类别名称。
-- 在服务器运行 CNN + SpecAugment 对比实验，并同步 `outputs/esc50_cnn_specaugment/history.json` 与 `latest_val_metrics.json` 回本地分析。
+- 尝试调小 SpecAugment 强度或进行多折验证，确认 +0.0075 的提升是否稳定。
 - 接入预训练 AST/ViT，并比较 CNN baseline、增强 CNN、预训练 Transformer 微调之间的效果差异。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 

@@ -37,7 +37,7 @@ def load_esc50_class_names(metadata_path: Path | None, labels: list[int]) -> dic
     return {label: class_names.get(label, fallback[label]) for label in labels}
 
 
-def plot_training_curves(history: list[dict[str, float]], output_dir: Path) -> None:
+def plot_training_curves(history: list[dict[str, float]], output_dir: Path, title: str) -> None:
     """绘制 loss 与 accuracy 曲线，用于观察 baseline 是否稳定收敛。"""
     epochs = [record["epoch"] for record in history]
 
@@ -46,7 +46,7 @@ def plot_training_curves(history: list[dict[str, float]], output_dir: Path) -> N
     plt.plot(epochs, [record["val_loss"] for record in history], marker="o", label="Val Loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("ESC-50 CNN Baseline Loss")
+    plt.title(f"{title} Loss")
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
@@ -58,7 +58,7 @@ def plot_training_curves(history: list[dict[str, float]], output_dir: Path) -> N
     plt.plot(epochs, [record["val_accuracy"] for record in history], marker="o", label="Val Accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
-    plt.title("ESC-50 CNN Baseline Accuracy")
+    plt.title(f"{title} Accuracy")
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
@@ -94,7 +94,9 @@ def save_class_metrics(rows: list[dict[str, object]], output_dir: Path) -> None:
         writer.writerows(rows)
 
 
-def plot_confusion_matrix(labels: list[int], matrix: np.ndarray, class_names: dict[int, str], output_dir: Path) -> None:
+def plot_confusion_matrix(
+    labels: list[int], matrix: np.ndarray, class_names: dict[int, str], output_dir: Path, title: str
+) -> None:
     """绘制归一化混淆矩阵，重点观察哪些类别被系统性混淆。"""
     row_sums = matrix.sum(axis=1, keepdims=True)
     normalized = np.divide(matrix, row_sums, out=np.zeros_like(matrix, dtype=float), where=row_sums != 0)
@@ -112,7 +114,7 @@ def plot_confusion_matrix(labels: list[int], matrix: np.ndarray, class_names: di
     )
     plt.xlabel("Predicted Class")
     plt.ylabel("True Class")
-    plt.title("ESC-50 CNN Baseline Normalized Confusion Matrix")
+    plt.title(f"{title} Normalized Confusion Matrix")
     plt.xticks(rotation=90, fontsize=7)
     plt.yticks(rotation=0, fontsize=7)
     plt.tight_layout()
@@ -125,6 +127,7 @@ def write_summary(
     metrics: dict[str, object],
     class_rows: list[dict[str, object]],
     output_dir: Path,
+    title: str,
 ) -> None:
     """生成 Markdown 摘要，沉淀本轮 baseline 的关键结论和后续分析入口。"""
     best_val = max(history, key=lambda record: record["val_accuracy"])
@@ -134,7 +137,7 @@ def write_summary(
     strongest = sorted_by_accuracy[-5:][::-1]
 
     lines = [
-        "# ESC-50 CNN Baseline 结果摘要",
+        f"# {title} 结果摘要",
         "",
         "## 整体结果",
         "",
@@ -190,6 +193,7 @@ def main() -> None:
         help="可选 ESC-50 元数据路径，用于把类别编号映射为类别名",
     )
     parser.add_argument("--output-dir", default="outputs/esc50_baseline/analysis", help="分析结果输出目录")
+    parser.add_argument("--title", default="ESC-50 CNN Baseline", help="图表和摘要中显示的实验名称")
     args = parser.parse_args()
 
     history = load_json(Path(args.history))
@@ -202,11 +206,11 @@ def main() -> None:
     metadata_path = Path(args.metadata) if args.metadata else None
     class_names = load_esc50_class_names(metadata_path, labels)
 
-    plot_training_curves(history, output_dir)
+    plot_training_curves(history, output_dir, args.title)
     class_rows = build_class_metrics(labels, matrix, class_names)
     save_class_metrics(class_rows, output_dir)
-    plot_confusion_matrix(labels, matrix, class_names, output_dir)
-    write_summary(history, metrics, class_rows, output_dir)
+    plot_confusion_matrix(labels, matrix, class_names, output_dir, args.title)
+    write_summary(history, metrics, class_rows, output_dir, args.title)
 
     print(f"分析完成，结果已保存到：{output_dir}")
 

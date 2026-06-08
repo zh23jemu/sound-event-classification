@@ -1,0 +1,3 @@
+experiment,history_path,epochs,best_epoch,best_val_accuracy,best_val_loss,final_train_accuracy,final_val_accuracy,final_val_loss
+CNN baseline,outputs\esc50_baseline\history.json,20,19,0.4125,2.0202338790893553,0.46875,0.4075,2.1382866048812867
+CNN + SpecAugment,outputs\esc50_cnn_specaugment\history.json,20,19,0.42,2.041676707267761,0.400625,0.3825,2.0838949394226076

@@ -116,6 +116,16 @@ SpecAugment 对比实验默认输出到 `outputs/esc50_cnn_specaugment`，目录
 - `class_metrics.csv`：每个类别的样本数、正确数和类别准确率。
 - `summary.md`：适合写入报告的结果摘要。
 
+多个实验完成后，可生成对比摘要：
+
+```powershell
+.venv\Scripts\python.exe scripts\compare_esc50_experiments.py `
+  --experiment "CNN baseline=outputs/esc50_baseline/history.json" `
+  --experiment "CNN + SpecAugment=outputs/esc50_cnn_specaugment/history.json"
+```
+
+对比结果默认输出到 `outputs/esc50_comparison`。
+
 ## 常见问题
 
 ### torchaudio / torchcodec 解码报错
