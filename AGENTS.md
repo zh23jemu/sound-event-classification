@@ -73,6 +73,7 @@
 - 已新增 `README.md`、`requirements.txt`、`configs/esc50_baseline.yaml`、`scripts/prepare_esc50.py`、`scripts/train.py`、`src/sound_event_classification/`、`slurm/train_esc50_baseline.sbatch` 和 `项目日志.md`。
 - 服务器端 ESC-50 baseline 已完成首次 20 epoch 训练，最佳验证 Accuracy 为 0.4125，最佳模型保存到 `outputs/esc50_baseline/best_model.pt`。
 - 已基于同步回本地的 `history.json` 和 `latest_val_metrics.json` 生成训练曲线、归一化混淆矩阵、类别级指标 CSV 和 Markdown 结果摘要。
+- 已新增 CNN + SpecAugment 对比实验入口，配置为 `configs/esc50_cnn_specaugment.yaml`，默认输出到 `outputs/esc50_cnn_specaugment`。
 
 ## Recent Changes
 
@@ -100,11 +101,12 @@
 - 服务器首次运行 ESC-50 baseline 时，数据检查通过且任务成功切换到 `ISP` 分区，但训练在 `torchaudio.load()` 阶段触发 TorchCodec/FFmpeg 依赖问题；已改用 `scipy.io.wavfile` 读取 ESC-50 WAV，避开 TorchCodec。
 - 服务器重跑 ESC-50 baseline 成功完成：Slurm 作业 `34857536` 在 `ISP` 分区完成 20 epoch，最佳验证 Accuracy = 0.4125，说明当前数据读取、Log-Mel 特征、CNN 训练和 Slurm 提交流程均已跑通。
 - 新增 `scripts/analyze_esc50_results.py`，生成 `outputs/esc50_baseline/analysis/training_loss.png`、`training_accuracy.png`、`confusion_matrix_normalized.png`、`class_metrics.csv` 和 `summary.md`。
+- 新增 `SpecAugment` 训练增强模块，并更新 `scripts/train.py` 支持训练阶段增强、验证阶段关闭；更新 Slurm 脚本支持 `CONFIG` 环境变量切换配置。
 
 ## Next TODO
 
 - 同步或保留 ESC-50 元数据 `meta/esc50.csv`，重新运行分析脚本以显示真实类别名称。
-- 在已跑通的 CNN baseline 基础上做改进比较，优先尝试 SpecAugment、mixup、随机裁剪等数据增强。
+- 在服务器运行 CNN + SpecAugment 对比实验，并同步 `outputs/esc50_cnn_specaugment/history.json` 与 `latest_val_metrics.json` 回本地分析。
 - 接入预训练 AST/ViT，并比较 CNN baseline、增强 CNN、预训练 Transformer 微调之间的效果差异。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 

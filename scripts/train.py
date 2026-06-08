@@ -19,7 +19,7 @@ if str(SRC_ROOT) not in sys.path:
 
 from sound_event_classification.config import load_config
 from sound_event_classification.data import ESC50Dataset
-from sound_event_classification.features import LogMelSpectrogram
+from sound_event_classification.features import LogMelSpectrogram, SpecAugment
 from sound_event_classification.metrics import classification_metrics
 from sound_event_classification.models import build_model
 
@@ -47,6 +47,7 @@ def run_epoch(
     dataloader: DataLoader,
     criterion: nn.Module,
     device: torch.device,
+    augmentation: nn.Module | None = None,
     optimizer: torch.optim.Optimizer | None = None,
 ) -> tuple[float, list[int], list[int]]:
     """执行一个训练或验证 epoch。
@@ -58,6 +59,8 @@ def run_epoch(
     is_train = optimizer is not None
     model.train(is_train)
     feature_extractor.train(False)
+    if augmentation is not None:
+        augmentation.train(is_train)
 
     total_loss = 0.0
     total_samples = 0
@@ -70,6 +73,8 @@ def run_epoch(
 
         with torch.set_grad_enabled(is_train):
             features = feature_extractor(waveform)
+            if is_train and augmentation is not None:
+                features = augmentation(features)
             logits = model(features)
             loss = criterion(logits, target)
 
@@ -131,6 +136,18 @@ def main() -> None:
         n_fft=int(config["data"]["n_fft"]),
         hop_length=int(config["data"]["hop_length"]),
     ).to(device)
+    augmentation_config = config.get("augmentation", {})
+    augmentation = None
+    if bool(augmentation_config.get("enabled", False)):
+        # SpecAugment 只改变训练时的频谱输入，不改变标签和验证流程。
+        # 这里通过配置控制强度，便于后续做“无增强 vs 有增强”的公平对比。
+        augmentation = SpecAugment(
+            time_mask_param=int(augmentation_config.get("time_mask_param", 32)),
+            freq_mask_param=int(augmentation_config.get("freq_mask_param", 16)),
+            num_time_masks=int(augmentation_config.get("num_time_masks", 2)),
+            num_freq_masks=int(augmentation_config.get("num_freq_masks", 2)),
+            p=float(augmentation_config.get("p", 1.0)),
+        ).to(device)
     model = build_model(
         name=str(config["model"]["name"]),
         num_classes=int(config["model"]["num_classes"]),
@@ -150,10 +167,10 @@ def main() -> None:
 
     for epoch in range(1, int(config["train"]["epochs"]) + 1):
         train_loss, train_true, train_pred = run_epoch(
-            model, feature_extractor, train_loader, criterion, device, optimizer
+            model, feature_extractor, train_loader, criterion, device, augmentation, optimizer
         )
         val_loss, val_true, val_pred = run_epoch(
-            model, feature_extractor, val_loader, criterion, device
+            model, feature_extractor, val_loader, criterion, device, augmentation
         )
 
         train_metrics = classification_metrics(train_true, train_pred)
@@ -191,4 +208,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

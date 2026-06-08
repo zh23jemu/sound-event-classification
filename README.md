@@ -64,6 +64,12 @@ Windows 本地运行：
 .venv\Scripts\python.exe scripts\train.py --config configs\esc50_baseline.yaml
 ```
 
+运行 CNN + SpecAugment 对比实验：
+
+```powershell
+.venv\Scripts\python.exe scripts\train.py --config configs\esc50_cnn_specaugment.yaml
+```
+
 Linux / Slurm 集群运行：
 
 ```bash
@@ -76,6 +82,12 @@ sbatch slurm/train_esc50_baseline.sbatch
 sbatch --partition=gpu slurm/train_esc50_baseline.sbatch
 ```
 
+如需在 Slurm 上运行 SpecAugment 配置：
+
+```bash
+sbatch --partition=ISP --export=ALL,CONFIG=configs/esc50_cnn_specaugment.yaml slurm/train_esc50_baseline.sbatch
+```
+
 ## 输出说明
 
 默认输出目录为 `outputs/esc50_baseline`，包括：
@@ -83,6 +95,8 @@ sbatch --partition=gpu slurm/train_esc50_baseline.sbatch
 - `history.json`：每轮训练和验证指标。
 - `latest_val_metrics.json`：最近一轮验证集指标和混淆矩阵。
 - `best_model.pt`：验证 Accuracy 最好的模型权重。
+
+SpecAugment 对比实验默认输出到 `outputs/esc50_cnn_specaugment`，目录结构与 baseline 保持一致。
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
 

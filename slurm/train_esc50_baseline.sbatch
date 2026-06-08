@@ -23,4 +23,7 @@ mkdir -p outputs/slurm
 
 # 使用集群上的项目本地虚拟环境，避免调用系统 Python。
 # 如果集群环境还没有 .venv，请先在登录节点按 requirements.txt 创建并安装依赖。
-.venv/bin/python scripts/train.py --config configs/esc50_baseline.yaml
+# 可通过环境变量覆盖配置文件，例如：
+#   sbatch --partition=ISP --export=ALL,CONFIG=configs/esc50_cnn_specaugment.yaml slurm/train_esc50_baseline.sbatch
+CONFIG="${CONFIG:-configs/esc50_baseline.yaml}"
+.venv/bin/python scripts/train.py --config "${CONFIG}"
