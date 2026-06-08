@@ -3,9 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 import torchaudio
+from scipy.io import wavfile
 from torch.utils.data import Dataset
 
 
@@ -69,13 +71,39 @@ class ESC50Dataset(Dataset[tuple[torch.Tensor, int]]):
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
         item = self.items[index]
-        waveform, sr = torchaudio.load(item.audio_path)
+        waveform, sr = self._load_wav(item.audio_path)
 
         if sr != self.sample_rate:
             waveform = torchaudio.functional.resample(waveform, sr, self.sample_rate)
 
         waveform = self._fix_length(waveform)
         return waveform, item.target
+
+    @staticmethod
+    def _load_wav(path: Path) -> tuple[torch.Tensor, int]:
+        """使用 SciPy 读取 WAV，避开新版 torchaudio 对 TorchCodec/FFmpeg 的依赖。
+
+        ESC-50 原始音频是普通 WAV 文件，用 `scipy.io.wavfile` 读取足够稳定。
+        这里手动把整数 PCM 归一化到 [-1, 1]，并统一转成 `[channels, samples]`
+        形状，保持后续特征提取流程不变。
+        """
+
+        sample_rate, audio = wavfile.read(path)
+        audio_array = np.asarray(audio)
+
+        if np.issubdtype(audio_array.dtype, np.integer):
+            max_value = float(np.iinfo(audio_array.dtype).max)
+            audio_array = audio_array.astype(np.float32) / max_value
+        else:
+            audio_array = audio_array.astype(np.float32)
+
+        if audio_array.ndim == 1:
+            audio_array = audio_array[np.newaxis, :]
+        else:
+            audio_array = audio_array.T
+
+        waveform = torch.from_numpy(np.ascontiguousarray(audio_array))
+        return waveform, sample_rate
 
     def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
         """把音频裁剪或补零到固定长度，保证 batch 内张量形状一致。"""
@@ -86,4 +114,3 @@ class ESC50Dataset(Dataset[tuple[torch.Tensor, int]]):
             pad = self.num_samples - waveform.size(-1)
             return torch.nn.functional.pad(waveform, (0, pad))
         return waveform
-

@@ -95,6 +95,7 @@
 - 新增 ESC-50 baseline 工程骨架：数据目录检查脚本、Log-Mel Spectrogram 特征模块、ESC-50 Dataset、轻量 CNN baseline、单标签分类指标和训练入口。
 - 新增 Slurm CPU baseline 脚本，默认 `defq` 分区、`gpo-ifv7xx` 账号、`normal` QOS；注释说明后续可用 `sbatch --partition=gpu` 覆盖分区。
 - 更新 `.gitignore`，忽略原始数据目录、大模型权重、checkpoint 和 Slurm 运行日志，但不整体忽略 `outputs/`，保留小型指标和图表用于报告分析。
+- 服务器首次运行 ESC-50 baseline 时，数据检查通过且任务成功切换到 `ISP` 分区，但训练在 `torchaudio.load()` 阶段触发 TorchCodec/FFmpeg 依赖问题；已改用 `scipy.io.wavfile` 读取 ESC-50 WAV，避开 TorchCodec。
 
 ## Next TODO
 
@@ -117,6 +118,7 @@
 - 当前总篇幅约为 `文献综述.md` 4810 个中文字符、`项目计划.md` 2610 个中文字符，理论上接近但应能控制在 12 页内；实际页数仍需以 Word 渲染为准。
 - 当前尚未下载 ESC-50 数据，训练脚本尚未完成真实数据训练验证。
 - 当前 `.venv` 依赖尚未完整安装；本次执行 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 在 120 秒后超时，仍缺 `torch`、`pandas` 等依赖。
+- 服务器端 ESC-50 已下载并通过目录检查；下一次运行前需要 `git pull` 同步 SciPy WAV 读取修复，并确保服务器 `.venv` 已安装 `scipy`。
 
 ## Architecture Decisions
 

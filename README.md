@@ -84,3 +84,11 @@ sbatch --partition=gpu slurm/train_esc50_baseline.sbatch
 - `best_model.pt`：验证 Accuracy 最好的模型权重。
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
+
+## 常见问题
+
+### torchaudio / torchcodec 解码报错
+
+部分新版 `torchaudio.load()` 会通过 TorchCodec/FFmpeg 解码音频，容易遇到集群运行库不匹配问题。当前代码已经改为用 `scipy.io.wavfile` 读取 ESC-50 的 WAV 文件，因此不需要安装 `torchcodec`。
+
+如果服务器已经装过 `torchcodec`，可以保留；训练脚本不会再调用它。更新代码后请重新运行 `git pull`，再提交 Slurm 任务。
