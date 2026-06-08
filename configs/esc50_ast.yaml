@@ -1,0 +1,29 @@
+# ESC-50 预训练 AST 微调配置。
+# 该实验用于和 CNN baseline / CNN + SpecAugment 做主线比较，体现项目计划中的 Transformer/ViT 路线。
+seed: 42
+
+data:
+  # AST 预训练模型默认使用 16 kHz 音频输入，因此这里与 CNN baseline 的 32 kHz 分开配置。
+  root: data/ESC-50
+  sample_rate: 16000
+  duration_seconds: 5.0
+  train_folds: [1, 2, 3, 4]
+  val_folds: [5]
+
+train:
+  batch_size: 4
+  epochs: 10
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  num_workers: 0
+  device: auto
+  amp: true
+  gradient_accumulation_steps: 1
+
+model:
+  # AudioSet 预训练/微调 AST 权重，用作 ESC-50 小数据集迁移学习起点。
+  pretrained_name: MIT/ast-finetuned-audioset-10-10-0.4593
+  num_classes: 50
+
+output:
+  dir: outputs/esc50_ast

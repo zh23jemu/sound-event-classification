@@ -9,12 +9,14 @@
 | `configs/esc50_baseline.yaml` | ESC-50 baseline 默认配置 |
 | `scripts/prepare_esc50.py` | 检查 ESC-50 数据目录是否准备好 |
 | `scripts/train.py` | 训练和验证入口 |
+| `scripts/train_ast.py` | 预训练 AST 微调入口 |
 | `scripts/analyze_esc50_results.py` | 分析训练结果，生成曲线、混淆矩阵和类别级指标 |
 | `src/sound_event_classification/data.py` | ESC-50 数据读取与音频裁剪/填充 |
 | `src/sound_event_classification/features.py` | Log-Mel Spectrogram 特征提取 |
 | `src/sound_event_classification/models.py` | 当前轻量 CNN baseline，后续可接入 AST/ViT |
 | `src/sound_event_classification/metrics.py` | 单标签分类指标 |
 | `slurm/train_esc50_baseline.sbatch` | Slurm 集群训练脚本 |
+| `slurm/train_esc50_ast.sbatch` | Slurm GPU AST 微调脚本 |
 | `项目日志.md` | 项目日志模板和实验记录 |
 
 ## 环境准备
@@ -70,6 +72,12 @@ Windows 本地运行：
 .venv\Scripts\python.exe scripts\train.py --config configs\esc50_cnn_specaugment.yaml
 ```
 
+运行预训练 AST 微调实验：
+
+```powershell
+.venv\Scripts\python.exe scripts\train_ast.py --config configs\esc50_ast.yaml
+```
+
 Linux / Slurm 集群运行：
 
 ```bash
@@ -88,6 +96,18 @@ sbatch --partition=gpu slurm/train_esc50_baseline.sbatch
 sbatch --partition=ISP --export=ALL,CONFIG=configs/esc50_cnn_specaugment.yaml slurm/train_esc50_baseline.sbatch
 ```
 
+AST 微调建议使用 GPU 分区：
+
+```bash
+sbatch slurm/train_esc50_ast.sbatch
+```
+
+首次运行 AST 前，如果服务器 `.venv` 还没有 Transformers 依赖，可先安装：
+
+```bash
+.venv/bin/python -m pip install transformers accelerate
+```
+
 ## 输出说明
 
 默认输出目录为 `outputs/esc50_baseline`，包括：
@@ -97,6 +117,8 @@ sbatch --partition=ISP --export=ALL,CONFIG=configs/esc50_cnn_specaugment.yaml sl
 - `best_model.pt`：验证 Accuracy 最好的模型权重。
 
 SpecAugment 对比实验默认输出到 `outputs/esc50_cnn_specaugment`，目录结构与 baseline 保持一致。
+
+AST 微调实验默认输出到 `outputs/esc50_ast`，同样会保存 `history.json`、`latest_val_metrics.json` 和 `best_model.pt`。
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
 

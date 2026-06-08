@@ -75,6 +75,7 @@
 - 已基于同步回本地的 `history.json` 和 `latest_val_metrics.json` 生成训练曲线、归一化混淆矩阵、类别级指标 CSV 和 Markdown 结果摘要。
 - 已新增 CNN + SpecAugment 对比实验入口，配置为 `configs/esc50_cnn_specaugment.yaml`，默认输出到 `outputs/esc50_cnn_specaugment`。
 - 服务器端 CNN + SpecAugment 已完成训练，最佳验证 Accuracy 为 0.4200，相比 CNN baseline 的 0.4125 提升 +0.0075；已生成 `outputs/esc50_comparison` 对比摘要。
+- 已新增预训练 AST 微调入口，配置为 `configs/esc50_ast.yaml`，训练脚本为 `scripts/train_ast.py`，Slurm GPU 脚本为 `slurm/train_esc50_ast.sbatch`。
 
 ## Recent Changes
 
@@ -104,12 +105,13 @@
 - 新增 `scripts/analyze_esc50_results.py`，生成 `outputs/esc50_baseline/analysis/training_loss.png`、`training_accuracy.png`、`confusion_matrix_normalized.png`、`class_metrics.csv` 和 `summary.md`。
 - 新增 `SpecAugment` 训练增强模块，并更新 `scripts/train.py` 支持训练阶段增强、验证阶段关闭；更新 Slurm 脚本支持 `CONFIG` 环境变量切换配置。
 - 新增 `scripts/compare_esc50_experiments.py`，并生成 CNN baseline 与 CNN + SpecAugment 的对比表；SpecAugment 最佳验证 Accuracy = 0.4200，baseline = 0.4125。
+- 新增 Hugging Face AST 微调脚本和 GPU Slurm 脚本，补充 `transformers`、`accelerate` 依赖；AST 输出沿用 `history.json` 和 `latest_val_metrics.json`，便于复用现有分析流程。
 
 ## Next TODO
 
 - 同步或保留 ESC-50 元数据 `meta/esc50.csv`，重新运行分析脚本以显示真实类别名称。
-- 尝试调小 SpecAugment 强度或进行多折验证，确认 +0.0075 的提升是否稳定。
-- 接入预训练 AST/ViT，并比较 CNN baseline、增强 CNN、预训练 Transformer 微调之间的效果差异。
+- 在服务器安装 Transformers 依赖并提交 `slurm/train_esc50_ast.sbatch`，完成预训练 AST 微调。
+- AST 训练完成后同步结果，更新 `outputs/esc50_comparison`，比较 CNN baseline、增强 CNN 和预训练 Transformer 微调之间的效果差异。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
 ## Open Issues
@@ -126,6 +128,7 @@
 - 当前 `.venv` 依赖尚未完整安装；本次执行 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 在 120 秒后超时，仍缺 `torch`、`pandas` 等依赖。
 - 本地 Windows 环境仍未完成完整依赖安装，真实训练目前以服务器 Slurm 环境为准。
 - ESC-50 baseline 已生成类别级指标和混淆矩阵，但本地缺少 ESC-50 元数据时类别名只能显示为编号；如报告需要可读类别名称，需要同步 `meta/esc50.csv` 或在服务器上运行分析脚本。
+- AST 首次运行需要下载 Hugging Face 预训练权重；如果计算节点无法联网，需要先在登录节点预下载缓存或设置 `HF_HOME` 到共享可见目录。
 
 ## Architecture Decisions
 
