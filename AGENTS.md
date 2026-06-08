@@ -78,6 +78,7 @@
 - 已新增预训练 AST 微调入口，配置为 `configs/esc50_ast.yaml`，训练脚本为 `scripts/train_ast.py`，Slurm GPU 脚本为 `slurm/train_esc50_ast.sbatch`。
 - 服务器端预训练 AST 已完成训练，最佳验证 Accuracy 为 0.9300，第 4 轮达到最佳；相比 CNN baseline 提升 +0.5175，当前是项目最强主线结果。
 - 已新增 `实验结果分析.md`，将 CNN baseline、CNN + SpecAugment 和 Pretrained AST 三组结果整理成最终报告可用的实验结果分析章节草稿。
+- 已新增 `模型报告.md`，整合文献背景、研究问题、方法、实验结果、讨论、局限性、未来工作和参考文献，形成完整模型报告初稿。
 
 ## Recent Changes
 
@@ -110,11 +111,12 @@
 - 新增 Hugging Face AST 微调脚本和 GPU Slurm 脚本，补充 `transformers`、`accelerate` 依赖；AST 输出沿用 `history.json` 和 `latest_val_metrics.json`，便于复用现有分析流程。
 - 已同步 AST 训练结果并生成 `outputs/esc50_ast/analysis`；已更新 `outputs/esc50_comparison`，纳入 CNN baseline、CNN + SpecAugment 和 Pretrained AST 三组实验。
 - 新增 `实验结果分析.md`，覆盖实验目的、数据划分、实验设置、结果表、训练曲线、混淆矩阵、讨论、局限性和后续工作。
+- 新增 `模型报告.md`，将 `文献综述.md`、`项目计划.md` 和 `实验结果分析.md` 的核心内容整合为最终报告初稿。
 
 ## Next TODO
 
 - 同步或保留 ESC-50 元数据 `meta/esc50.csv`，重新运行分析脚本以显示真实类别名称。
-- 将 `实验结果分析.md` 与 `文献综述.md`、`项目计划.md` 整合为完整模型报告初稿。
+- 将 `模型报告.md` 转换为 Word 文档，并检查图表、表格、页数和参考文献格式。
 - 如果时间允许，补充 AST 类别级错误分析、多 fold 验证或轻量调参，增强结论稳健性。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
