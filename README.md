@@ -18,6 +18,7 @@
 | `slurm/train_esc50_baseline.sbatch` | Slurm 集群训练脚本 |
 | `slurm/train_esc50_ast.sbatch` | Slurm GPU AST 微调脚本 |
 | `项目日志.md` | 项目日志模板和实验记录 |
+| `实验结果分析.md` | 可放入最终报告的实验结果分析章节草稿 |
 
 ## 环境准备
 
