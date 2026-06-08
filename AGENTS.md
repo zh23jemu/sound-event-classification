@@ -71,6 +71,7 @@
 - 修订后的 `项目计划.md` 明确补充 Research Question、Intended Outcomes、实验范围、时间安排、成功标准、风险应对和 AI 工具使用说明。
 - 已开始按照项目计划进入代码实现阶段，新增 ESC-50 baseline 的最小可运行工程骨架。
 - 已新增 `README.md`、`requirements.txt`、`configs/esc50_baseline.yaml`、`scripts/prepare_esc50.py`、`scripts/train.py`、`src/sound_event_classification/`、`slurm/train_esc50_baseline.sbatch` 和 `项目日志.md`。
+- 服务器端 ESC-50 baseline 已完成首次 20 epoch 训练，最佳验证 Accuracy 为 0.4125，最佳模型保存到 `outputs/esc50_baseline/best_model.pt`。
 
 ## Recent Changes
 
@@ -96,13 +97,13 @@
 - 新增 Slurm CPU baseline 脚本，默认 `defq` 分区、`gpo-ifv7xx` 账号、`normal` QOS；注释说明后续可用 `sbatch --partition=gpu` 覆盖分区。
 - 更新 `.gitignore`，忽略原始数据目录、大模型权重、checkpoint 和 Slurm 运行日志，但不整体忽略 `outputs/`，保留小型指标和图表用于报告分析。
 - 服务器首次运行 ESC-50 baseline 时，数据检查通过且任务成功切换到 `ISP` 分区，但训练在 `torchaudio.load()` 阶段触发 TorchCodec/FFmpeg 依赖问题；已改用 `scipy.io.wavfile` 读取 ESC-50 WAV，避开 TorchCodec。
+- 服务器重跑 ESC-50 baseline 成功完成：Slurm 作业 `34857536` 在 `ISP` 分区完成 20 epoch，最佳验证 Accuracy = 0.4125，说明当前数据读取、Log-Mel 特征、CNN 训练和 Slurm 提交流程均已跑通。
 
 ## Next TODO
 
-- 下载并解压 ESC-50 到 `data/ESC-50`，运行 `.venv\Scripts\python.exe scripts\prepare_esc50.py --root data\ESC-50` 检查目录。
-- 使用 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 安装 baseline 依赖；如在 GPU 集群运行 PyTorch，优先安装 CUDA 12.x 兼容 wheel。
-- 运行 `.venv\Scripts\python.exe scripts\train.py --config configs\esc50_baseline.yaml` 做首次 CNN baseline sanity check。
-- 后续在 baseline 跑通后，接入预训练 AST/ViT，并比较无增强/有增强、冻结/解冻等改进策略。
+- 从服务器同步 `outputs/esc50_baseline/history.json`、`outputs/esc50_baseline/latest_val_metrics.json` 等小型结果文件，生成训练曲线、类别级指标和混淆矩阵。
+- 在已跑通的 CNN baseline 基础上做改进比较，优先尝试 SpecAugment、mixup、随机裁剪等数据增强。
+- 接入预训练 AST/ViT，并比较 CNN baseline、增强 CNN、预训练 Transformer 微调之间的效果差异。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
 ## Open Issues
@@ -116,9 +117,9 @@
 - 6 月初中期展示需要刻意保留“接近完成但可继续优化”的半成品状态，避免展示内容看起来已经完全结束。
 - `文献综述.docx` 和 `项目计划.docx` 已由 Markdown 重新生成，但当前环境缺少 `soffice`，尚未完成页面级视觉渲染检查；如果导师要求严格版式，需要在 Word/LibreOffice 中再做最终检查。
 - 当前总篇幅约为 `文献综述.md` 4810 个中文字符、`项目计划.md` 2610 个中文字符，理论上接近但应能控制在 12 页内；实际页数仍需以 Word 渲染为准。
-- 当前尚未下载 ESC-50 数据，训练脚本尚未完成真实数据训练验证。
 - 当前 `.venv` 依赖尚未完整安装；本次执行 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 在 120 秒后超时，仍缺 `torch`、`pandas` 等依赖。
-- 服务器端 ESC-50 已下载并通过目录检查；下一次运行前需要 `git pull` 同步 SciPy WAV 读取修复，并确保服务器 `.venv` 已安装 `scipy`。
+- 本地 Windows 环境仍未完成完整依赖安装，真实训练目前以服务器 Slurm 环境为准。
+- ESC-50 baseline 已跑通，但当前仅有整体 Accuracy，需要补充类别级指标和错误分析，避免报告中只有单一数值。
 
 ## Architecture Decisions
 
