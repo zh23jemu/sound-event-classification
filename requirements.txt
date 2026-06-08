@@ -1,0 +1,10 @@
+torch
+torchaudio
+torchvision
+PyYAML
+tqdm
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn

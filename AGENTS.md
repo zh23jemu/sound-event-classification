@@ -17,9 +17,10 @@
 
 ## 当前架构
 
-- 当前仓库仍处于项目初始化阶段。
+- 当前仓库已从文档初始化阶段进入 baseline 代码框架阶段。
 - 已有输入材料：`模型要求.docx`
-- 当前尚无训练代码、数据处理脚本和实验配置文件。
+- 已有代码结构：`configs/` 保存训练配置，`scripts/` 保存数据检查和训练入口，`src/sound_event_classification/` 保存数据读取、特征提取、模型和指标代码，`slurm/` 保存集群提交脚本。
+- 当前 baseline 以 ESC-50 + Log-Mel Spectrogram + 轻量 CNN 为第一步，后续再接入 AST/ViT 预训练模型做改进比较。
 
 ## 开发规范
 
@@ -68,6 +69,8 @@
 - 已按 `反馈修改.docx` 完成 `文献综述.md` 与 `项目计划.md` 修订，并重新生成 `文献综述.docx` 与 `项目计划.docx`。
 - 修订后的 `文献综述.md` 聚焦已有研究、方法比较、综合分析和研究空白，参考文献扩展到 18 篇，弱化项目实施方案描述。
 - 修订后的 `项目计划.md` 明确补充 Research Question、Intended Outcomes、实验范围、时间安排、成功标准、风险应对和 AI 工具使用说明。
+- 已开始按照项目计划进入代码实现阶段，新增 ESC-50 baseline 的最小可运行工程骨架。
+- 已新增 `README.md`、`requirements.txt`、`configs/esc50_baseline.yaml`、`scripts/prepare_esc50.py`、`scripts/train.py`、`src/sound_event_classification/`、`slurm/train_esc50_baseline.sbatch` 和 `项目日志.md`。
 
 ## Recent Changes
 
@@ -89,12 +92,16 @@
 - 重写 `文献综述.md`：按任务与数据集、时频表示与 CNN、频谱图 Transformer、自监督音频表征、数据增强、音视频学习和研究空白组织内容。
 - 重写 `项目计划.md`：将 Research Question 与 Intended Outcomes 前置，并将数据集使用范围、方法流程、时间计划、成功标准和风险控制集中到计划文档。
 - 使用新版 Markdown 重新生成 `文献综述.docx` 和 `项目计划.docx`，并通过反提 Word 正文确认内容已同步；由于本机缺少 LibreOffice/`soffice`，未能完成页面 PNG 渲染视觉检查。
+- 新增 ESC-50 baseline 工程骨架：数据目录检查脚本、Log-Mel Spectrogram 特征模块、ESC-50 Dataset、轻量 CNN baseline、单标签分类指标和训练入口。
+- 新增 Slurm CPU baseline 脚本，默认 `defq` 分区、`gpo-ifv7xx` 账号、`normal` QOS；注释说明后续可用 `sbatch --partition=gpu` 覆盖分区。
+- 更新 `.gitignore`，忽略原始数据目录、大模型权重、checkpoint 和 Slurm 运行日志，但不整体忽略 `outputs/`，保留小型指标和图表用于报告分析。
 
 ## Next TODO
 
-- 建立项目日志模板，至少覆盖日期、目标、阅读/实验记录、遇到问题、解决方案、结论和下一步。
-- 后续方案确认后，创建数据预处理、Mel-Spectrogram 特征提取、AST/ViT 微调训练与评估脚本。
-- 根据 `项目计划.md`，下一步优先准备 6 月初中期展示所需的半成品材料和代码框架。
+- 下载并解压 ESC-50 到 `data/ESC-50`，运行 `.venv\Scripts\python.exe scripts\prepare_esc50.py --root data\ESC-50` 检查目录。
+- 使用 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 安装 baseline 依赖；如在 GPU 集群运行 PyTorch，优先安装 CUDA 12.x 兼容 wheel。
+- 运行 `.venv\Scripts\python.exe scripts\train.py --config configs\esc50_baseline.yaml` 做首次 CNN baseline sanity check。
+- 后续在 baseline 跑通后，接入预训练 AST/ViT，并比较无增强/有增强、冻结/解冻等改进策略。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
 ## Open Issues
@@ -108,6 +115,8 @@
 - 6 月初中期展示需要刻意保留“接近完成但可继续优化”的半成品状态，避免展示内容看起来已经完全结束。
 - `文献综述.docx` 和 `项目计划.docx` 已由 Markdown 重新生成，但当前环境缺少 `soffice`，尚未完成页面级视觉渲染检查；如果导师要求严格版式，需要在 Word/LibreOffice 中再做最终检查。
 - 当前总篇幅约为 `文献综述.md` 4810 个中文字符、`项目计划.md` 2610 个中文字符，理论上接近但应能控制在 12 页内；实际页数仍需以 Word 渲染为准。
+- 当前尚未下载 ESC-50 数据，训练脚本尚未完成真实数据训练验证。
+- 当前 `.venv` 依赖尚未完整安装；本次执行 `.venv\Scripts\python.exe -m pip install -r requirements.txt` 在 120 秒后超时，仍缺 `torch`、`pandas` 等依赖。
 
 ## Architecture Decisions
 

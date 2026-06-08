@@ -1,0 +1,31 @@
+# ESC-50 最小 baseline 配置。
+# 当前阶段目标是先跑通“音频读取 -> Log-Mel 特征 -> CNN baseline -> 评估记录”的完整闭环。
+seed: 42
+
+data:
+  # ESC-50 解压后的根目录，目录下应包含 meta/esc50.csv 和 audio/*.wav。
+  root: data/ESC-50
+  sample_rate: 32000
+  duration_seconds: 5.0
+  n_mels: 128
+  n_fft: 1024
+  hop_length: 320
+  train_folds: [1, 2, 3, 4]
+  val_folds: [5]
+
+train:
+  batch_size: 16
+  epochs: 20
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  num_workers: 0
+  device: auto
+  amp: false
+
+model:
+  name: cnn_baseline
+  num_classes: 50
+  dropout: 0.2
+
+output:
+  dir: outputs/esc50_baseline
