@@ -80,6 +80,7 @@
 - 已新增 `实验结果分析.md`，将 CNN baseline、CNN + SpecAugment 和 Pretrained AST 三组结果整理成最终报告可用的实验结果分析章节草稿。
 - 已新增 `模型报告.md`，整合文献背景、研究问题、方法、实验结果、讨论、局限性、未来工作和参考文献，形成完整模型报告初稿。
 - 已同步 ESC-50 官方元数据 `metadata/esc50.csv`，并重新生成三组实验的真实类别名混淆矩阵、类别级指标和分析摘要。
+- 已新增 `模型报告.docx`，由 `模型报告.md` 生成，作为模型报告 Word 初稿；由于本机缺少 `soffice`，尚未完成页面 PNG 渲染检查。
 
 ## Recent Changes
 
@@ -114,10 +115,11 @@
 - 新增 `实验结果分析.md`，覆盖实验目的、数据划分、实验设置、结果表、训练曲线、混淆矩阵、讨论、局限性和后续工作。
 - 新增 `模型报告.md`，将 `文献综述.md`、`项目计划.md` 和 `实验结果分析.md` 的核心内容整合为最终报告初稿。
 - 新增 `metadata/esc50.csv`，重新生成 `outputs/esc50_baseline/analysis`、`outputs/esc50_cnn_specaugment/analysis` 和 `outputs/esc50_ast/analysis`，类别名已从 `class_00` 等编号更新为 ESC-50 真实类别名称。
+- 新增 `scripts/build_model_report_docx.py` 和 `模型报告.docx`；基础结构检查显示 Word 文档包含 73 个段落、3 个表格和 4 张图片。
 
 ## Next TODO
 
-- 将更新真实类别名后的 `模型报告.md` 转换为 Word 文档，并检查图表、表格、页数和参考文献格式。
+- 打开 `模型报告.docx` 做人工视觉检查，重点检查图表、表格、页数、标题层级和参考文献格式。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
@@ -136,6 +138,7 @@
 - 本地 Windows 环境仍未完成完整依赖安装，真实训练目前以服务器 Slurm 环境为准。
 - ESC-50 baseline 已生成类别级指标和混淆矩阵，但本地缺少 ESC-50 元数据时类别名只能显示为编号；如报告需要可读类别名称，需要同步 `meta/esc50.csv` 或在服务器上运行分析脚本。
 - AST 首次运行的 Hugging Face 预训练权重已成功加载；分类头从 AudioSet 527 类重建为 ESC-50 50 类时出现 MISMATCH 提示属于预期现象。
+- `模型报告.docx` 尚未进行 LibreOffice/Word 页面级视觉 QA；提交前需要人工打开检查。
 
 ## Architecture Decisions
 
