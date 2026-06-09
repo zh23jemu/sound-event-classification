@@ -81,6 +81,7 @@
 - 已新增 `模型报告.md`，整合文献背景、研究问题、方法、实验结果、讨论、局限性、未来工作和参考文献，形成完整模型报告初稿。
 - 已同步 ESC-50 官方元数据 `metadata/esc50.csv`，并重新生成三组实验的真实类别名混淆矩阵、类别级指标和分析摘要。
 - 已新增 `模型报告.docx`，由 `模型报告.md` 生成，作为模型报告 Word 初稿；由于本机缺少 `soffice`，尚未完成页面 PNG 渲染检查。
+- 已明确 FSD50K 不再只是可选未来工作，而是下一阶段扩展实验；已新增 FSD50K Dataset、多标签指标、数据检查脚本、AST 多标签训练脚本、配置和 Slurm 脚本。
 
 ## Recent Changes
 
@@ -116,16 +117,18 @@
 - 新增 `模型报告.md`，将 `文献综述.md`、`项目计划.md` 和 `实验结果分析.md` 的核心内容整合为最终报告初稿。
 - 新增 `metadata/esc50.csv`，重新生成 `outputs/esc50_baseline/analysis`、`outputs/esc50_cnn_specaugment/analysis` 和 `outputs/esc50_ast/analysis`，类别名已从 `class_00` 等编号更新为 ESC-50 真实类别名称。
 - 新增 `scripts/build_model_report_docx.py` 和 `模型报告.docx`；基础结构检查显示 Word 文档包含 73 个段落、3 个表格和 4 张图片。
+- 新增 FSD50K 扩展代码：`scripts/prepare_fsd50k.py`、`scripts/train_fsd50k_ast.py`、`configs/fsd50k_ast.yaml`、`slurm/train_fsd50k_ast.sbatch`，并更新 `src/sound_event_classification/data.py` 和 `metrics.py` 支持多标签任务。
 
 ## Next TODO
 
 - 打开 `模型报告.docx` 做人工视觉检查，重点检查图表、表格、页数、标题层级和参考文献格式。
+- 在服务器下载 FSD50K，运行数据检查脚本，然后提交 FSD50K AST 多标签训练任务。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
 ## Open Issues
 
-- 仍需结合实际算力与时间，最终确认是否直接以 FSD50K 作为主实验入口，或先用 ESC-50 完成一轮基线复现后再切换。
+- FSD50K 已明确为下一阶段扩展实验；当前风险从“是否扩展”转为“数据下载体积、训练时长和多标签指标稳定性”。
 - 尚未确认算力条件，暂时无法精确锁定预训练、微调还是从头训练的方案。
 - 音视频迁移方向需要进一步评估数据可得性与实现复杂度。
 - VGGSound 官方下载入口不再直接提供完整视频文件，后续如走音视频方向，需要提前验证可下载样本比例。

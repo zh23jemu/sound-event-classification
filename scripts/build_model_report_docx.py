@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import argparse
 from pathlib import Path
 
 from docx import Document
@@ -179,8 +180,14 @@ def build_docx(markdown_path: Path, output_path: Path) -> None:
 
 
 def main() -> None:
-    build_docx(PROJECT_ROOT / "模型报告.md", PROJECT_ROOT / "模型报告.docx")
-    print("已生成：模型报告.docx")
+    parser = argparse.ArgumentParser(description="把项目 Markdown 报告转换为 Word 文档")
+    parser.add_argument("--input", default="模型报告.md", help="输入 Markdown 文件")
+    parser.add_argument("--output", default="模型报告.docx", help="输出 Word 文件")
+    args = parser.parse_args()
+
+    output_path = PROJECT_ROOT / args.output
+    build_docx(PROJECT_ROOT / args.input, output_path)
+    print(f"已生成：{output_path.name}")
 
 
 if __name__ == "__main__":

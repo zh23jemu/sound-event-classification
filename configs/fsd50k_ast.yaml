@@ -1,0 +1,28 @@
+# FSD50K 预训练 AST 多标签微调配置。
+# FSD50K 是 200 类 clip-level 多标签任务，评价指标使用 mAP、micro-F1 和 macro-F1。
+seed: 42
+
+data:
+  root: data/FSD50K
+  sample_rate: 16000
+  duration_seconds: 10.0
+  train_split: train
+  val_split: val
+
+train:
+  batch_size: 4
+  epochs: 5
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  num_workers: 0
+  device: auto
+  amp: true
+  gradient_accumulation_steps: 2
+  threshold: 0.5
+
+model:
+  pretrained_name: MIT/ast-finetuned-audioset-10-10-0.4593
+  num_classes: 200
+
+output:
+  dir: outputs/fsd50k_ast

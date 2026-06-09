@@ -21,6 +21,20 @@ class Esc50Item:
     fold: int
 
 
+@dataclass(frozen=True)
+class Fsd50kItem:
+    """FSD50K 单条样本的元信息。
+
+    FSD50K 是 clip-level 多标签数据集，一条音频可能同时对应多个声音事件。
+    因此这里保存的是多热标签向量，而不是 ESC-50 中的单个整数类别。
+    """
+
+    audio_path: Path
+    labels: list[str]
+    target: torch.Tensor
+    split: str
+
+
 class ESC50Dataset(Dataset[tuple[torch.Tensor, int]]):
     """ESC-50 数据集读取器。
 
@@ -107,6 +121,115 @@ class ESC50Dataset(Dataset[tuple[torch.Tensor, int]]):
 
     def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
         """把音频裁剪或补零到固定长度，保证 batch 内张量形状一致。"""
+
+        if waveform.size(-1) > self.num_samples:
+            return waveform[..., : self.num_samples]
+        if waveform.size(-1) < self.num_samples:
+            pad = self.num_samples - waveform.size(-1)
+            return torch.nn.functional.pad(waveform, (0, pad))
+        return waveform
+
+
+class FSD50KDataset(Dataset[tuple[torch.Tensor, torch.Tensor]]):
+    """FSD50K 多标签数据集读取器。
+
+    目录约定：
+        data/FSD50K/
+          FSD50K.dev_audio/*.wav
+          FSD50K.eval_audio/*.wav
+          FSD50K.ground_truth/dev.csv
+          FSD50K.ground_truth/eval.csv
+          FSD50K.ground_truth/vocabulary.csv
+
+    `dev.csv` 内部包含官方 `train` / `val` 划分，`eval.csv` 用于最终评估。
+    当前实现优先支持 `train`、`val` 和 `eval` 三种 split。
+    """
+
+    def __init__(
+        self,
+        root: str | Path,
+        split: str,
+        sample_rate: int,
+        duration_seconds: float,
+    ) -> None:
+        self.root = Path(root)
+        self.split = split
+        self.sample_rate = sample_rate
+        self.num_samples = int(sample_rate * duration_seconds)
+        self.ground_truth_dir = self.root / "FSD50K.ground_truth"
+        self.vocabulary_path = self.ground_truth_dir / "vocabulary.csv"
+        self.label_to_index, self.index_to_label = self._load_vocabulary(self.vocabulary_path)
+
+        if split in {"train", "val"}:
+            metadata_path = self.ground_truth_dir / "dev.csv"
+            audio_dir = self.root / "FSD50K.dev_audio"
+            metadata = pd.read_csv(metadata_path)
+            metadata = metadata[metadata["split"] == split].reset_index(drop=True)
+        elif split == "eval":
+            metadata_path = self.ground_truth_dir / "eval.csv"
+            audio_dir = self.root / "FSD50K.eval_audio"
+            metadata = pd.read_csv(metadata_path)
+        else:
+            raise ValueError("FSD50K split 只能是 train、val 或 eval")
+
+        if metadata.empty:
+            raise ValueError(f"FSD50K 指定 split 没有样本：{split}")
+
+        self.items = [
+            Fsd50kItem(
+                audio_path=audio_dir / f"{row['fname']}.wav",
+                labels=self._split_labels(str(row["labels"])),
+                target=self._labels_to_multihot(str(row["labels"])),
+                split=split,
+            )
+            for _, row in metadata.iterrows()
+        ]
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        item = self.items[index]
+        waveform, sr = ESC50Dataset._load_wav(item.audio_path)
+
+        if sr != self.sample_rate:
+            waveform = torchaudio.functional.resample(waveform, sr, self.sample_rate)
+
+        waveform = self._fix_length(waveform)
+        return waveform, item.target.clone()
+
+    @staticmethod
+    def _split_labels(labels: str) -> list[str]:
+        """解析 FSD50K CSV 中逗号分隔的多标签字符串。"""
+
+        return [label.strip() for label in labels.split(",") if label.strip()]
+
+    @staticmethod
+    def _load_vocabulary(path: Path) -> tuple[dict[str, int], list[str]]:
+        """读取 FSD50K vocabulary.csv，建立标签到索引的映射。"""
+
+        if not path.exists():
+            raise FileNotFoundError(f"没有找到 FSD50K vocabulary.csv：{path}")
+
+        vocabulary = pd.read_csv(path, header=None)
+        if vocabulary.shape[1] < 2:
+            raise ValueError(f"FSD50K vocabulary.csv 至少应包含索引和标签两列：{path}")
+
+        label_names = vocabulary.iloc[:, 1].astype(str).tolist()
+        label_to_index = {label: index for index, label in enumerate(label_names)}
+        return label_to_index, label_names
+
+    def _labels_to_multihot(self, labels: str) -> torch.Tensor:
+        """把 FSD50K 标签列表转换为 multi-hot 向量。"""
+
+        target = torch.zeros(len(self.index_to_label), dtype=torch.float32)
+        for label in self._split_labels(labels):
+            if label in self.label_to_index:
+                target[self.label_to_index[label]] = 1.0
+        return target
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        """把可变长度 FSD50K 音频裁剪或补零到固定长度。"""
 
         if waveform.size(-1) > self.num_samples:
             return waveform[..., : self.num_samples]

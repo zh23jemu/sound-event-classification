@@ -8,8 +8,10 @@
 | --- | --- |
 | `configs/esc50_baseline.yaml` | ESC-50 baseline 默认配置 |
 | `scripts/prepare_esc50.py` | 检查 ESC-50 数据目录是否准备好 |
+| `scripts/prepare_fsd50k.py` | 检查 FSD50K 数据目录是否准备好 |
 | `scripts/train.py` | 训练和验证入口 |
 | `scripts/train_ast.py` | 预训练 AST 微调入口 |
+| `scripts/train_fsd50k_ast.py` | FSD50K 预训练 AST 多标签微调入口 |
 | `scripts/analyze_esc50_results.py` | 分析训练结果，生成曲线、混淆矩阵和类别级指标 |
 | `src/sound_event_classification/data.py` | ESC-50 数据读取与音频裁剪/填充 |
 | `src/sound_event_classification/features.py` | Log-Mel Spectrogram 特征提取 |
@@ -17,6 +19,7 @@
 | `src/sound_event_classification/metrics.py` | 单标签分类指标 |
 | `slurm/train_esc50_baseline.sbatch` | Slurm 集群训练脚本 |
 | `slurm/train_esc50_ast.sbatch` | Slurm GPU AST 微调脚本 |
+| `slurm/train_fsd50k_ast.sbatch` | Slurm GPU FSD50K 多标签微调脚本 |
 | `项目日志.md` | 项目日志模板和实验记录 |
 | `实验结果分析.md` | 可放入最终报告的实验结果分析章节草稿 |
 | `模型报告.md` | 整合文献背景、方法、实验和结论的模型报告初稿 |
@@ -59,6 +62,49 @@ data/ESC-50/
 
 ```powershell
 .venv\Scripts\python.exe scripts\prepare_esc50.py --root data\ESC-50
+```
+
+FSD50K 扩展实验需要下载官方 Zenodo 数据。由于音频文件较大，建议放在服务器共享存储或容量充足的位置，再在项目 `data/` 下放软链接。目录最终应类似：
+
+```text
+data/FSD50K/
+  FSD50K.dev_audio/
+  FSD50K.eval_audio/
+  FSD50K.ground_truth/
+    dev.csv
+    eval.csv
+    vocabulary.csv
+```
+
+服务器下载和解压示例：
+
+```bash
+mkdir -p data/FSD50K_downloads data/FSD50K
+cd data/FSD50K_downloads
+
+wget -O FSD50K.ground_truth.zip "https://zenodo.org/record/4060432/files/FSD50K.ground_truth.zip?download=1"
+wget -O FSD50K.metadata.zip "https://zenodo.org/record/4060432/files/FSD50K.metadata.zip?download=1"
+
+wget -O FSD50K.dev_audio.z01 "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.z01?download=1"
+wget -O FSD50K.dev_audio.z02 "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.z02?download=1"
+wget -O FSD50K.dev_audio.z03 "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.z03?download=1"
+wget -O FSD50K.dev_audio.z04 "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.z04?download=1"
+wget -O FSD50K.dev_audio.z05 "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.z05?download=1"
+wget -O FSD50K.dev_audio.zip "https://zenodo.org/record/4060432/files/FSD50K.dev_audio.zip?download=1"
+
+wget -O FSD50K.eval_audio.z01 "https://zenodo.org/record/4060432/files/FSD50K.eval_audio.z01?download=1"
+wget -O FSD50K.eval_audio.zip "https://zenodo.org/record/4060432/files/FSD50K.eval_audio.zip?download=1"
+
+zip -s 0 FSD50K.dev_audio.zip --out FSD50K.dev_audio.unsplit.zip
+zip -s 0 FSD50K.eval_audio.zip --out FSD50K.eval_audio.unsplit.zip
+
+unzip FSD50K.ground_truth.zip -d ../FSD50K
+unzip FSD50K.metadata.zip -d ../FSD50K
+unzip FSD50K.dev_audio.unsplit.zip -d ../FSD50K
+unzip FSD50K.eval_audio.unsplit.zip -d ../FSD50K
+
+cd ../..
+.venv/bin/python scripts/prepare_fsd50k.py --root data/FSD50K
 ```
 
 ## 运行 baseline
@@ -105,6 +151,18 @@ AST 微调建议使用 GPU 分区：
 sbatch slurm/train_esc50_ast.sbatch
 ```
 
+FSD50K 多标签 AST 微调建议使用 GPU 分区：
+
+```bash
+sbatch slurm/train_fsd50k_ast.sbatch
+```
+
+如需使用 8 小时时限的 `gpuHz` 分区，可提交：
+
+```bash
+sbatch --partition=gpuHz slurm/train_fsd50k_ast.sbatch
+```
+
 首次运行 AST 前，如果服务器 `.venv` 还没有 Transformers 依赖，可先安装：
 
 ```bash
@@ -122,6 +180,8 @@ sbatch slurm/train_esc50_ast.sbatch
 SpecAugment 对比实验默认输出到 `outputs/esc50_cnn_specaugment`，目录结构与 baseline 保持一致。
 
 AST 微调实验默认输出到 `outputs/esc50_ast`，同样会保存 `history.json`、`latest_val_metrics.json` 和 `best_model.pt`。
+
+FSD50K 多标签 AST 实验默认输出到 `outputs/fsd50k_ast`，主要指标为 `mAP`、`micro_f1` 和 `macro_f1`。
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
 
