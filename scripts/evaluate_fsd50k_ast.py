@@ -17,7 +17,7 @@ if str(SRC_ROOT) not in sys.path:
 from sound_event_classification.config import load_config
 from sound_event_classification.data import FSD50KDataset
 from sound_event_classification.metrics import multilabel_classification_metrics
-from train_fsd50k_ast import Fsd50kAstBatchCollator, resolve_device
+from train_fsd50k_ast import Fsd50kAstBatchCollator, iter_dataset_items, resolve_device
 
 
 def evaluate(
@@ -61,7 +61,7 @@ def write_predictions(
     """写出验证集逐样本预测，保持类别顺序和样本顺序可追溯。"""
 
     samples = []
-    for item, true_row, score_row in zip(dataset.samples, y_true, y_score):
+    for item, true_row, score_row in zip(iter_dataset_items(dataset), y_true, y_score):
         samples.append(
             {
                 "fname": item.fname,

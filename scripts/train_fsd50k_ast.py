@@ -108,6 +108,17 @@ def run_epoch(
     return total_loss / max(total_samples, 1), y_true, y_score
 
 
+def iter_dataset_items(dataset: FSD50KDataset):
+    """返回 FSD50K 数据集内部样本元信息。
+
+    `FSD50KDataset` 当前将样本列表保存在 `items` 字段。单独封装这一层，
+    是为了让预测导出逻辑只依赖一个明确入口，后续若数据集字段名调整，也只
+    需要修改这里。
+    """
+
+    return dataset.items
+
+
 def write_val_predictions(
     path: Path,
     dataset: FSD50KDataset,
@@ -121,11 +132,11 @@ def write_val_predictions(
     训练历史中的 mAP、micro-F1 和 macro-F1 只能说明整体表现，无法回答哪些
     类别表现好、哪些类别受长尾分布影响更大。这里额外保存验证集每个样本的
     multi-hot 真值和 sigmoid 概率；由于验证 DataLoader 固定 `shuffle=False`，
-    `dataset.samples` 的顺序与 `y_true`、`y_score` 一一对应。
+    `dataset.items` 的顺序与 `y_true`、`y_score` 一一对应。
     """
 
     samples = []
-    for item, true_row, score_row in zip(dataset.samples, y_true, y_score):
+    for item, true_row, score_row in zip(iter_dataset_items(dataset), y_true, y_score):
         samples.append(
             {
                 "fname": item.fname,
