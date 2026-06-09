@@ -83,6 +83,7 @@
 - 已新增 `模型报告.docx`，由 `模型报告.md` 生成，作为模型报告 Word 初稿；由于本机缺少 `soffice`，尚未完成页面 PNG 渲染检查。
 - 已明确 FSD50K 不再只是可选未来工作，而是下一阶段扩展实验；已新增 FSD50K Dataset、多标签指标、数据检查脚本、AST 多标签训练脚本、配置和 Slurm 脚本。
 - 服务器端 FSD50K AST 多标签训练已完成，最佳验证 mAP 为 0.6208，第 4 轮达到最佳；最佳轮 micro-F1 为 0.6955，macro-F1 为 0.4810。
+- 已补充 FSD50K 类别级和阈值敏感性分析链路：训练脚本后续会保存最佳验证轮预测概率，新增独立评估脚本可用服务器已有最佳模型导出 `val_predictions.json`，分析脚本可基于该文件生成类别级 AP/F1 和阈值扫描结果。
 
 ## Recent Changes
 
@@ -120,17 +121,20 @@
 - 新增 `scripts/build_model_report_docx.py` 和 `模型报告.docx`；基础结构检查显示 Word 文档包含 73 个段落、3 个表格和 4 张图片。
 - 新增 FSD50K 扩展代码：`scripts/prepare_fsd50k.py`、`scripts/train_fsd50k_ast.py`、`configs/fsd50k_ast.yaml`、`slurm/train_fsd50k_ast.sbatch`，并更新 `src/sound_event_classification/data.py` 和 `metrics.py` 支持多标签任务。
 - 新增 `scripts/analyze_fsd50k_results.py`，生成 `outputs/fsd50k_ast/analysis/training_loss.png`、`validation_metrics.png` 和 `summary.md`；模型报告和实验分析已写入 FSD50K 初步结果。
+- 新增 `scripts/evaluate_fsd50k_ast.py`，可读取 `outputs/fsd50k_ast/best_model.pt` 并导出验证集逐样本预测概率；增强 `scripts/analyze_fsd50k_results.py`，在存在 `val_predictions.json` 时生成 `class_metrics.csv`、`threshold_sensitivity.csv` 和 `threshold_sensitivity.png`。
 
 ## Next TODO
 
 - 打开 `模型报告.docx` 做人工视觉检查，重点检查图表、表格、页数、标题层级和参考文献格式。
-- 将 FSD50K 图表同步到 Word 报告，并视时间补充类别级 mAP、阈值敏感性和长尾类别分析。
+- 在服务器执行 `scripts/evaluate_fsd50k_ast.py` 导出 `outputs/fsd50k_ast/val_predictions.json`，再运行 `scripts/analyze_fsd50k_results.py` 生成真实类别级 AP/F1 和阈值敏感性产物。
+- 同步服务器生成的 `val_predictions.json`、`class_metrics.csv`、`threshold_sensitivity.csv`、`threshold_sensitivity.png` 和新版 `summary.md` 后，更新 `模型报告.md`、`实验结果分析.md` 和 `模型报告.docx`。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
 ## Open Issues
 
 - FSD50K 已明确为下一阶段扩展实验；当前风险从“是否扩展”转为“数据下载体积、训练时长和多标签指标稳定性”。
+- 本地没有 FSD50K 原始音频和服务器端 `best_model.pt`，因此当前只能验证类别级/阈值分析代码路径，真实类别级 AP/F1 需要服务器先导出 `val_predictions.json`。
 - 尚未确认算力条件，暂时无法精确锁定预训练、微调还是从头训练的方案。
 - 音视频迁移方向需要进一步评估数据可得性与实现复杂度。
 - VGGSound 官方下载入口不再直接提供完整视频文件，后续如走音视频方向，需要提前验证可下载样本比例。

@@ -108,6 +108,44 @@ def run_epoch(
     return total_loss / max(total_samples, 1), y_true, y_score
 
 
+def write_val_predictions(
+    path: Path,
+    dataset: FSD50KDataset,
+    y_true: list[list[float]],
+    y_score: list[list[float]],
+    threshold: float,
+    epoch: int,
+) -> None:
+    """保存最佳验证轮的逐样本概率，供后续类别级 AP/F1 和阈值敏感性分析使用。
+
+    训练历史中的 mAP、micro-F1 和 macro-F1 只能说明整体表现，无法回答哪些
+    类别表现好、哪些类别受长尾分布影响更大。这里额外保存验证集每个样本的
+    multi-hot 真值和 sigmoid 概率；由于验证 DataLoader 固定 `shuffle=False`，
+    `dataset.samples` 的顺序与 `y_true`、`y_score` 一一对应。
+    """
+
+    samples = []
+    for item, true_row, score_row in zip(dataset.samples, y_true, y_score):
+        samples.append(
+            {
+                "fname": item.fname,
+                "labels": item.labels,
+                "y_true": true_row,
+                "y_score": score_row,
+            }
+        )
+
+    payload = {
+        "split": dataset.split,
+        "epoch": epoch,
+        "threshold": threshold,
+        "labels": dataset.index_to_label,
+        "samples": samples,
+    }
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(payload, file, ensure_ascii=False)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="微调预训练 AST 模型进行 FSD50K 多标签分类")
     parser.add_argument("--config", default="configs/fsd50k_ast.yaml", help="FSD50K AST 训练配置文件")
@@ -184,6 +222,7 @@ def main() -> None:
     history = []
     best_map = -1.0
     best_path = output_dir / "best_model.pt"
+    predictions_path = output_dir / "val_predictions.json"
 
     for epoch in range(1, int(config["train"]["epochs"]) + 1):
         train_loss, train_true, train_score = run_epoch(
@@ -230,6 +269,7 @@ def main() -> None:
                 },
                 best_path,
             )
+            write_val_predictions(predictions_path, val_dataset, val_true, val_score, threshold, epoch)
 
         with (output_dir / "history.json").open("w", encoding="utf-8") as file:
             json.dump(history, file, ensure_ascii=False, indent=2)
