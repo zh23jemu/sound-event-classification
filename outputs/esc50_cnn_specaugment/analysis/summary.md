@@ -12,19 +12,19 @@
 
 ## 类别级表现较好
 
-- class_49：Accuracy 1.0000，8/8
-- class_46：Accuracy 1.0000，8/8
-- class_11：Accuracy 1.0000，8/8
-- class_10：Accuracy 1.0000，8/8
-- class_20：Accuracy 0.8750，7/8
+- hand_saw：Accuracy 1.0000，8/8
+- church_bells：Accuracy 1.0000，8/8
+- sea_waves：Accuracy 1.0000，8/8
+- rain：Accuracy 1.0000，8/8
+- crying_baby：Accuracy 0.8750，7/8
 
 ## 类别级表现较弱
 
-- class_04：Accuracy 0.0000，0/8
-- class_05：Accuracy 0.0000，0/8
-- class_09：Accuracy 0.0000，0/8
-- class_15：Accuracy 0.0000，0/8
-- class_24：Accuracy 0.0000，0/8
+- frog：Accuracy 0.0000，0/8
+- cat：Accuracy 0.0000，0/8
+- crow：Accuracy 0.0000，0/8
+- water_drops：Accuracy 0.0000，0/8
+- coughing：Accuracy 0.0000，0/8
 
 ## 生成文件
 

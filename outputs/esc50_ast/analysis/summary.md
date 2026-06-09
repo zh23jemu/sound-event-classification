@@ -12,19 +12,19 @@
 
 ## 类别级表现较好
 
-- class_46：Accuracy 1.0000，8/8
-- class_44：Accuracy 1.0000，8/8
-- class_43：Accuracy 1.0000，8/8
-- class_42：Accuracy 1.0000，8/8
-- class_39：Accuracy 1.0000，8/8
+- church_bells：Accuracy 1.0000，8/8
+- engine：Accuracy 1.0000，8/8
+- car_horn：Accuracy 1.0000，8/8
+- siren：Accuracy 1.0000，8/8
+- glass_breaking：Accuracy 1.0000，8/8
 
 ## 类别级表现较弱
 
-- class_40：Accuracy 0.5000，4/8
-- class_02：Accuracy 0.6250，5/8
-- class_33：Accuracy 0.7500，6/8
-- class_47：Accuracy 0.7500，6/8
-- class_03：Accuracy 0.8750，7/8
+- helicopter：Accuracy 0.5000，4/8
+- pig：Accuracy 0.6250，5/8
+- door_wood_creaks：Accuracy 0.7500，6/8
+- airplane：Accuracy 0.7500，6/8
+- cow：Accuracy 0.8750，7/8
 
 ## 生成文件
 

@@ -12,19 +12,19 @@
 
 ## 类别级表现较好
 
-- class_13：Accuracy 1.0000，8/8
-- class_49：Accuracy 0.8750，7/8
-- class_42：Accuracy 0.8750，7/8
-- class_27：Accuracy 0.8750，7/8
-- class_17：Accuracy 0.8750，7/8
+- crickets：Accuracy 1.0000，8/8
+- hand_saw：Accuracy 0.8750，7/8
+- siren：Accuracy 0.8750，7/8
+- brushing_teeth：Accuracy 0.8750，7/8
+- pouring_water：Accuracy 0.8750，7/8
 
 ## 类别级表现较弱
 
-- class_02：Accuracy 0.0000，0/8
-- class_06：Accuracy 0.0000，0/8
-- class_08：Accuracy 0.0000，0/8
-- class_14：Accuracy 0.0000，0/8
-- class_23：Accuracy 0.0000，0/8
+- pig：Accuracy 0.0000，0/8
+- hen：Accuracy 0.0000，0/8
+- sheep：Accuracy 0.0000，0/8
+- chirping_birds：Accuracy 0.0000，0/8
+- breathing：Accuracy 0.0000，0/8
 
 ## 生成文件
 

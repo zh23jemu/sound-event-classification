@@ -20,6 +20,7 @@
 | `项目日志.md` | 项目日志模板和实验记录 |
 | `实验结果分析.md` | 可放入最终报告的实验结果分析章节草稿 |
 | `模型报告.md` | 整合文献背景、方法、实验和结论的模型报告初稿 |
+| `metadata/esc50.csv` | ESC-50 官方元数据，用于把类别编号映射为真实类别名 |
 
 ## 环境准备
 
@@ -139,6 +140,13 @@ AST 微调实验默认输出到 `outputs/esc50_ast`，同样会保存 `history.j
 - `confusion_matrix_normalized.png`：归一化混淆矩阵。
 - `class_metrics.csv`：每个类别的样本数、正确数和类别准确率。
 - `summary.md`：适合写入报告的结果摘要。
+
+项目已保存 ESC-50 官方元数据 `metadata/esc50.csv`。如需显式指定真实类别名映射，可运行：
+
+```powershell
+.venv\Scripts\python.exe scripts\analyze_esc50_results.py `
+  --metadata metadata/esc50.csv
+```
 
 多个实验完成后，可生成对比摘要：
 
