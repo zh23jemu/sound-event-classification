@@ -13,6 +13,7 @@
 | `scripts/train_ast.py` | 预训练 AST 微调入口 |
 | `scripts/train_fsd50k_ast.py` | FSD50K 预训练 AST 多标签微调入口 |
 | `scripts/analyze_esc50_results.py` | 分析训练结果，生成曲线、混淆矩阵和类别级指标 |
+| `scripts/analyze_fsd50k_results.py` | 分析 FSD50K 多标签结果，生成 mAP/F1 曲线和摘要 |
 | `src/sound_event_classification/data.py` | ESC-50 数据读取与音频裁剪/填充 |
 | `src/sound_event_classification/features.py` | Log-Mel Spectrogram 特征提取 |
 | `src/sound_event_classification/models.py` | 当前轻量 CNN baseline，后续可接入 AST/ViT |
@@ -182,6 +183,12 @@ SpecAugment 对比实验默认输出到 `outputs/esc50_cnn_specaugment`，目录
 AST 微调实验默认输出到 `outputs/esc50_ast`，同样会保存 `history.json`、`latest_val_metrics.json` 和 `best_model.pt`。
 
 FSD50K 多标签 AST 实验默认输出到 `outputs/fsd50k_ast`，主要指标为 `mAP`、`micro_f1` 和 `macro_f1`。
+
+当前 FSD50K 初步结果：
+
+- 最佳验证 mAP：`0.6208`
+- 最佳轮验证 micro-F1：`0.6955`
+- 最佳轮验证 macro-F1：`0.4810`
 
 当前项目不会整体忽略 `outputs/`，便于保留小型结果文件用于报告、截图和分析；但大模型权重和 checkpoint 文件默认不建议提交。
 

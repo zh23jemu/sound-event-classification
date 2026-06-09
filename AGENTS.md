@@ -82,6 +82,7 @@
 - 已同步 ESC-50 官方元数据 `metadata/esc50.csv`，并重新生成三组实验的真实类别名混淆矩阵、类别级指标和分析摘要。
 - 已新增 `模型报告.docx`，由 `模型报告.md` 生成，作为模型报告 Word 初稿；由于本机缺少 `soffice`，尚未完成页面 PNG 渲染检查。
 - 已明确 FSD50K 不再只是可选未来工作，而是下一阶段扩展实验；已新增 FSD50K Dataset、多标签指标、数据检查脚本、AST 多标签训练脚本、配置和 Slurm 脚本。
+- 服务器端 FSD50K AST 多标签训练已完成，最佳验证 mAP 为 0.6208，第 4 轮达到最佳；最佳轮 micro-F1 为 0.6955，macro-F1 为 0.4810。
 
 ## Recent Changes
 
@@ -118,11 +119,12 @@
 - 新增 `metadata/esc50.csv`，重新生成 `outputs/esc50_baseline/analysis`、`outputs/esc50_cnn_specaugment/analysis` 和 `outputs/esc50_ast/analysis`，类别名已从 `class_00` 等编号更新为 ESC-50 真实类别名称。
 - 新增 `scripts/build_model_report_docx.py` 和 `模型报告.docx`；基础结构检查显示 Word 文档包含 73 个段落、3 个表格和 4 张图片。
 - 新增 FSD50K 扩展代码：`scripts/prepare_fsd50k.py`、`scripts/train_fsd50k_ast.py`、`configs/fsd50k_ast.yaml`、`slurm/train_fsd50k_ast.sbatch`，并更新 `src/sound_event_classification/data.py` 和 `metrics.py` 支持多标签任务。
+- 新增 `scripts/analyze_fsd50k_results.py`，生成 `outputs/fsd50k_ast/analysis/training_loss.png`、`validation_metrics.png` 和 `summary.md`；模型报告和实验分析已写入 FSD50K 初步结果。
 
 ## Next TODO
 
 - 打开 `模型报告.docx` 做人工视觉检查，重点检查图表、表格、页数、标题层级和参考文献格式。
-- 在服务器下载 FSD50K，运行数据检查脚本，然后提交 FSD50K AST 多标签训练任务。
+- 将 FSD50K 图表同步到 Word 报告，并视时间补充类别级 mAP、阈值敏感性和长尾类别分析。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
