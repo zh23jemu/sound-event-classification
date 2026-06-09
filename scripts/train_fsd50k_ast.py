@@ -139,7 +139,8 @@ def write_val_predictions(
     for item, true_row, score_row in zip(iter_dataset_items(dataset), y_true, y_score):
         samples.append(
             {
-                "fname": item.fname,
+                "fname": item.audio_path.stem,
+                "audio_path": str(item.audio_path),
                 "labels": item.labels,
                 "y_true": true_row,
                 "y_score": score_row,
