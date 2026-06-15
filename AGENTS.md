@@ -127,8 +127,7 @@
 
 ## Next TODO
 
-- 打开 `模型报告.docx` 做人工视觉检查，重点检查图表、表格、页数、标题层级和参考文献格式。
-- 打开 `模型报告.docx` 做人工视觉检查，重点确认 FSD50K 阈值敏感性图、类别级结论、表格分页和参考文献格式。
+- 打开 `模型报告.docx` 做人工视觉检查，重点确认 FSD50K 阈值敏感性图、类别级结论、表格分页、页数、标题层级和参考文献格式。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
@@ -149,6 +148,7 @@
 - ESC-50 baseline 已生成类别级指标和混淆矩阵，但本地缺少 ESC-50 元数据时类别名只能显示为编号；如报告需要可读类别名称，需要同步 `meta/esc50.csv` 或在服务器上运行分析脚本。
 - AST 首次运行的 Hugging Face 预训练权重已成功加载；分类头从 AudioSet 527 类重建为 ESC-50 50 类时出现 MISMATCH 提示属于预期现象。
 - `模型报告.docx` 尚未进行 LibreOffice/Word 页面级视觉 QA；提交前需要人工打开检查。
+- 2026-06-15 已完成 `模型报告.docx` 结构与 OOXML 审计：文档包含 81 个段落、3 个表格、6 张内嵌图片；关键结果 `0.9300`、`0.6208`、`0.7101`、`阈值敏感性`、`Tick` 均存在；图片均为 inline 且无外链。由于本机缺少 `soffice`，页面 PNG 渲染仍未完成。
 
 ## Architecture Decisions
 
