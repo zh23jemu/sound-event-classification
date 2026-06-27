@@ -29,6 +29,12 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+.tmp_docx_render/
+
+# 本地下载与交付压缩包，不作为源码版本管理内容
+downloads/
+*.zip
+*.zip.sha256
 
 # 数据集原始文件通常体积较大，不直接纳入版本管理
 data/

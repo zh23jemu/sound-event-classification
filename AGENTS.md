@@ -85,6 +85,7 @@
 - 服务器端 FSD50K AST 多标签训练已完成，最佳验证 mAP 为 0.6208，第 4 轮达到最佳；最佳轮 micro-F1 为 0.6955，macro-F1 为 0.4810。
 - 已补充 FSD50K 类别级和阈值敏感性分析链路：训练脚本后续会保存最佳验证轮预测概率，新增独立评估脚本可用服务器已有最佳模型导出 `val_predictions.json`，分析脚本可基于该文件生成类别级 AP/F1 和阈值扫描结果。
 - 服务器端已导出 FSD50K 验证集逐样本预测并完成类别级与阈值敏感性分析：micro-F1 最优阈值为 0.20，micro-F1 = 0.7101；macro-F1 最优阈值为 0.15，macro-F1 = 0.5747；强类别包括 `Burping_and_eructation`、`Cat`、`Thunder`，弱类别包括 `Tick`、`Screech`、`Wood`。
+- 2026-06-27 已完成模型报告最终稿口径的第一轮润色：强化摘要、研究贡献、FSD50K 阈值敏感性结论、讨论和 AI 工具使用说明，并准备重新生成 `模型报告.docx`。
 
 ## Recent Changes
 
@@ -124,10 +125,12 @@
 - 新增 `scripts/analyze_fsd50k_results.py`，生成 `outputs/fsd50k_ast/analysis/training_loss.png`、`validation_metrics.png` 和 `summary.md`；模型报告和实验分析已写入 FSD50K 初步结果。
 - 新增 `scripts/evaluate_fsd50k_ast.py`，可读取 `outputs/fsd50k_ast/best_model.pt` 并导出验证集逐样本预测概率；增强 `scripts/analyze_fsd50k_results.py`，在存在 `val_predictions.json` 时生成 `class_metrics.csv`、`threshold_sensitivity.csv` 和 `threshold_sensitivity.png`。
 - 同步服务器端 `outputs/fsd50k_ast/val_predictions.json`、`class_metrics.csv`、`threshold_sensitivity.csv`、`threshold_sensitivity.png` 和新版 `summary.md`；更新 `模型报告.md`、`实验结果分析.md` 和 `项目日志.md` 写入真实类别级与阈值分析结论。
+- 润色 `模型报告.md` 的最终报告表达，补充递进实验流程、模型权重交付、FSD50K 阈值选择和预训练迁移贡献说明。
+- 更新 `.gitignore`，忽略 `.tmp_docx_render/`、`downloads/` 和本地 `*.zip` 交付压缩包，避免大文件或临时渲染文件误入库。
 
 ## Next TODO
 
-- 打开 `模型报告.docx` 做人工视觉检查，重点确认 FSD50K 阈值敏感性图、类别级结论、表格分页、页数、标题层级和参考文献格式。
+- 打开重新生成后的 `模型报告.docx` 做人工视觉检查，重点确认 FSD50K 阈值敏感性图、类别级结论、表格分页、页数、标题层级和参考文献格式。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
