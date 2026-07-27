@@ -86,6 +86,7 @@
 - 已补充 FSD50K 类别级和阈值敏感性分析链路：训练脚本后续会保存最佳验证轮预测概率，新增独立评估脚本可用服务器已有最佳模型导出 `val_predictions.json`，分析脚本可基于该文件生成类别级 AP/F1 和阈值扫描结果。
 - 服务器端已导出 FSD50K 验证集逐样本预测并完成类别级与阈值敏感性分析：micro-F1 最优阈值为 0.20，micro-F1 = 0.7101；macro-F1 最优阈值为 0.15，macro-F1 = 0.5747；强类别包括 `Burping_and_eructation`、`Cat`、`Thunder`，弱类别包括 `Tick`、`Screech`、`Wood`。
 - 2026-06-27 已完成模型报告最终稿口径的第一轮润色：强化摘要、研究贡献、FSD50K 阈值敏感性结论、讨论和 AI 工具使用说明，并准备重新生成 `模型报告.docx`。
+- 2026-07-28 已按用户要求执行 RecallLoom `rl-init`；`.recallloom` sidecar 可读且验证通过，但 `rolling_summary.md` 仍落后于当前项目状态，RecallLoom dispatcher 暂时阻止正式写入 current-state 和 daily log。
 
 ## Recent Changes
 
@@ -127,10 +128,12 @@
 - 同步服务器端 `outputs/fsd50k_ast/val_predictions.json`、`class_metrics.csv`、`threshold_sensitivity.csv`、`threshold_sensitivity.png` 和新版 `summary.md`；更新 `模型报告.md`、`实验结果分析.md` 和 `项目日志.md` 写入真实类别级与阈值分析结论。
 - 润色 `模型报告.md` 的最终报告表达，补充递进实验流程、模型权重交付、FSD50K 阈值选择和预训练迁移贡献说明。
 - 更新 `.gitignore`，忽略 `.tmp_docx_render/`、`downloads/` 和本地 `*.zip` 交付压缩包，避免大文件或临时渲染文件误入库。
+- 执行 RecallLoom 初始化/验证：使用 `--workspace-language zh-CN` 完成 `rl-init`，确认 sidecar 当前状态为可读但需要 `seed_initial_continuity`；尝试 dispatcher `write` 与 `append` 均被 `summary_stale / initialized_empty_shell` 防护门阻止，未手工修改 `.recallloom` 管理文件。
 
 ## Next TODO
 
 - 打开重新生成后的 `模型报告.docx` 做人工视觉检查，重点确认 FSD50K 阈值敏感性图、类别级结论、表格分页、页数、标题层级和参考文献格式。
+- 继续处理 RecallLoom `seed_initial_continuity` / `rolling_summary stale`：优先使用受支持 dispatcher 路径刷新 `.recallloom/rolling_summary.md`，不要手工编辑 `.recallloom/state.json`、`config.json` 或 managed markers。
 - 如果时间允许，围绕 AST 较弱类别 `helicopter`、`pig`、`door_wood_creaks`、`airplane` 补充错误分析，或做多 fold 验证/轻量调参。
 - 后续若具备 LibreOffice/Word 环境，应打开或渲染检查 `文献综述.docx` 与 `项目计划.docx` 的实际页数、表格宽度和分页效果，确认 Draft Literature Review + Project Plan 总篇幅不超过 12 页。
 
@@ -152,6 +155,7 @@
 - AST 首次运行的 Hugging Face 预训练权重已成功加载；分类头从 AudioSet 527 类重建为 ESC-50 50 类时出现 MISMATCH 提示属于预期现象。
 - `模型报告.docx` 尚未进行 LibreOffice/Word 页面级视觉 QA；提交前需要人工打开检查。
 - 2026-06-15 已完成 `模型报告.docx` 结构与 OOXML 审计：文档包含 81 个段落、3 个表格、6 张内嵌图片；关键结果 `0.9300`、`0.6208`、`0.7101`、`阈值敏感性`、`Tick` 均存在；图片均为 inline 且无外链。由于本机缺少 `soffice`，页面 PNG 渲染仍未完成。
+- RecallLoom 当前存在 `rolling_summary_workspace_revision_behind` 警告；dispatcher 返回 `safe_to_retry: false`，说明需要先解决受支持的 current-state 刷新路径，不能绕过 helper 手工写入 `.recallloom`。
 
 ## Architecture Decisions
 
