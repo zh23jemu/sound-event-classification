@@ -87,6 +87,7 @@
 - 服务器端已导出 FSD50K 验证集逐样本预测并完成类别级与阈值敏感性分析：micro-F1 最优阈值为 0.20，micro-F1 = 0.7101；macro-F1 最优阈值为 0.15，macro-F1 = 0.5747；强类别包括 `Burping_and_eructation`、`Cat`、`Thunder`，弱类别包括 `Tick`、`Screech`、`Wood`。
 - 2026-06-27 已完成模型报告最终稿口径的第一轮润色：强化摘要、研究贡献、FSD50K 阈值敏感性结论、讨论和 AI 工具使用说明，并准备重新生成 `模型报告.docx`。
 - 2026-07-28 已按用户要求执行并修复 RecallLoom `rl-init` 后续状态：`.recallloom` sidecar 已写入当前项目进度，`rolling_summary.md` 与 daily log 均通过 dispatcher/helper 更新，`rl-validate` 已达到 0 errors / 0 warnings。
+- 2026-09-24 已完成 Git 仓库整理与远端同步检查：工作区无未提交或未跟踪文件，远端 `origin/master` 无新增提交，准备推送本地已有文档更新。
 
 ## Recent Changes
 
